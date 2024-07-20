@@ -2,6 +2,7 @@ import gi
 gi.require_version('Gtk', '3.0')  
 from gi.repository import Gtk 
 import sys, subprocess, os, configparser
+import preference
 
 
 class AppWindow(Gtk.ApplicationWindow):  
@@ -25,7 +26,7 @@ class AppWindow(Gtk.ApplicationWindow):
 
         # "程序" 菜单项
         config_item = Gtk.MenuItem(label="首选项")  
-        config_item.connect("activate", self.on_quit)  
+        config_item.connect("activate", self.on_open_preference)  
         file_menu_dropdown.append(config_item)
         quit_item = Gtk.MenuItem(label="退出")  
         quit_item.connect("activate", self.on_quit)  
@@ -42,13 +43,13 @@ class AppWindow(Gtk.ApplicationWindow):
         readme_item.connect("activate", self.on_open_web, "")
         help_menu_dropdown.append(readme_item)
         github_item = Gtk.MenuItem(label="查看 Github 仓库")
-        github_item.connect("activate", self.on_quit)
+        github_item.connect("activate", self.on_open_web, "https://github.com/CatIsNotFound/ShellToolbox")
         help_menu_dropdown.append(github_item)
         checkUpdate_item = Gtk.MenuItem(label="检查更新")
-        checkUpdate_item.connect("activate", self.on_quit)
+        checkUpdate_item.connect("activate", self.get_newer_version)
         help_menu_dropdown.append(checkUpdate_item)
         version_item = Gtk.MenuItem(label="查看当前版本号")
-        version_item.connect("activate", self.on_quit)
+        version_item.connect("activate", self.get_version)
         help_menu_dropdown.append(version_item)
 
         # 创建笔记本  
@@ -56,33 +57,37 @@ class AppWindow(Gtk.ApplicationWindow):
         box.pack_start(self.notebook, True, True, 10)  
   
         # 读取菜单
-        # try:
-        menu_config = configparser.ConfigParser()
-        menu_config.read(f"{appPath}/config/menu.ini")
-        group_items = menu_config.get('groups', 'items').strip('"').split(",")
-        for group in group_items:
-            box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-            tab_name = menu_config.get(group, 'name').strip('"')
-            # print(tab_name)
-            tab_items = menu_config.get(group, 'items').strip('"').split(",")
-            for btn_item in tab_items:
-                btn_name = menu_config.get(btn_item, 'name').strip('"')
-                button = Gtk.Button(label=btn_name)
-                # print(f"    {btn_name}")
-                if 'run' in menu_config.options(btn_item):
-                    run_command = menu_config.get(btn_item, 'run').strip('"')
-                    button.connect("clicked", self.run_command, f'{appPath}{run_command}')
-                elif 'box_yes' in menu_config.options(btn_item):
-                    button.connect("clicked", self.messagebox, 1, menu_config.get())
+        try:
+            menu_config = configparser.ConfigParser()
+            menu_config.read(f"{appPath}/config/menu.ini")
+            group_items = menu_config.get('groups', 'items').strip('"').split(",")
+            for group in group_items:
+                box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+                tab_name = menu_config.get(group, 'name').strip('"')
+                # print(tab_name)
+                tab_items = menu_config.get(group, 'items').strip('"').split(",")
+                for btn_item in tab_items:
+                    btn_name = menu_config.get(btn_item, 'name').strip('"')
+                    button = Gtk.Button(label=btn_name)
+                    # print(f"    {btn_name}")
+                    if 'run' in menu_config.options(btn_item):
+                        run_command = menu_config.get(btn_item, 'run').strip('"')
+                        button.connect("clicked", self.run_command, f'{appPath}{run_command}')
+                    elif 'box_yes' in menu_config.options(btn_item):
+                        button.connect("clicked", self.messagebox, 1, menu_config.get())
 
-                box.pack_start(button, True, True, 0)
-            self.notebook.append_page(box, Gtk.Label(label=tab_name))
-        # except BaseException:
-        #     self.show_error_dialog("Error: 找不到菜单文件或无法读取菜单! \n(code: 128)")
-        #     quit()
+                    box.pack_start(button, True, True, 0)
+                self.notebook.append_page(box, Gtk.Label(label=tab_name))
+        except BaseException:
+            self.show_error_dialog("Error: 找不到菜单或无法读取菜单! \n(code: 128)")
+            quit()
 
     def on_quit(self, widget):  
         quit()
+    
+    def on_open_preference(self, widget):
+        preference.main(f'{appPath}/config/setup.ini')
+        options()
 
     def on_button_clicked(self, widget, button_text):  
         print(f"正在执行：{button_text}") 
@@ -91,7 +96,13 @@ class AppWindow(Gtk.ApplicationWindow):
         n = self.show_question_dialog("即将使用浏览器访问外部网页，是否前往? ")
         if n == 1:
             run_outside_command(f"gnome-www-browser -- {url}")
-            
+    
+    def get_version(self, widget):
+        self.show_info_dialog("版本号: 0.1.0\n使用 Bash Shell 编写脚本\n使用 GTK 3+ 编写 UI")
+    
+    def get_newer_version(self, widget):
+        self.show_info_dialog("此版本下暂不支持检查更新, 请前往 Github Release 页面下载.")
+
 
     # 执行程序
     def run_command(self, widget, command):
@@ -102,10 +113,15 @@ class AppWindow(Gtk.ApplicationWindow):
     # 打开后台终端并执行脚本
     def open_terminal(self, terminal, operation):
         command = f'{appPath}/scripts/start_script.sh {terminal} {operation}'
-        print(f'正在执行：{command}')
+        # print(f'正在执行：{command}')
         process = subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stderr = process.stderr.readline().decode()
+        stdout = process.stdout.readline().decode()
         process.wait()
-        return process.returncode
+        if stdout == "128":
+            self.show_error_dialog(f"Error: 执行时产生错误! (code: 128) \n错误内容如下: \n{stderr}")
+        elif stdout == "127":
+            self.show_error_dialog("Error: 未知的终端! 请选择其它终端! (code: 127)")
     
     # 显示问题对话框
     def show_question_dialog(self, button_text):
@@ -143,7 +159,7 @@ class AppWindow(Gtk.ApplicationWindow):
         warning_dialog.destroy() 
     
     # 显示信息对话框
-    def show_info_dialog(self, widget, button_text):
+    def show_info_dialog(self, button_text):
         info_dialog = Gtk.MessageDialog(self,  
                                         0,  
                                         Gtk.MessageType.INFO,  
@@ -161,29 +177,27 @@ class Application(Gtk.Application):
         win = AppWindow(application=self)  
         win.show_all()  
         win.present()
+    
 
 # 用户配置文件
 def options():
-    config = configparser.ConfigParser()
+    global config
     global terminal
     global appPath
+    config = configparser.ConfigParser()
     if os.path.exists("config/setup.ini"):
         config.read('config/setup.ini')
         terminal = config.get('Config', 'terminal')
         appPath = config.get('Config', 'appPath')
-        config.clear()
     else:
         # run_subprocess("sudo chmod -R u+x ./scripts/*.sh")
         appPath = get_output("pwd")
         terminal = get_output(f"{appPath}/scripts/get_terminal.sh")
-        context = f'''# 自动生成配置文件
-[Config]
-appPath={appPath}
-terminal={terminal}
-# EOF
-'''
+        config.add_section("Config")
+        config.set("Config", "appPath", appPath)
+        config.set("Config", "terminal", terminal)
         with open(f"{appPath}/config/setup.ini", 'w', encoding='utf-8') as file:
-            file.write(context)
+            config.write(file)
         file.close()
 
 def get_output(command):
@@ -196,6 +210,7 @@ def run_outside_command(command):
     process = subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 if __name__ == "__main__":  
+    
     options()
     app = Application()  
     exit_status = app.run(sys.argv)  

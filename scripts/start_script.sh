@@ -15,12 +15,11 @@ case $1 in
         ;;
     *)
         # echo "错误：找不到终端以执行！"
-        exit 128
+        echo -n "127"
+        exit 127
         ;;
 esac
-echo $@
-
 if [ $? -ne 0 ];then
-    # echo "错误：无法打开终端执行！"
+    echo -n "128"
     exit 128
 fi
