@@ -4,7 +4,7 @@ case $1 in
     gnome)
         gnome-terminal -- $2 $3 $4 $5 $6 $7 $8 $9
         ;;
-    kde)
+    plasma)
         konsole -e "bash" $2 $3 $4 $5 $6 $7 $8 $9
         ;;
     xfce4)

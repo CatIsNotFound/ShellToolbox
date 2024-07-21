@@ -59,6 +59,8 @@ class AppWindow(Gtk.ApplicationWindow):
         # 读取菜单
         try:
             menu_config = configparser.ConfigParser()
+            with open(f"{appPath}/config/menu.ini", 'r', encoding='utf-8') as f:
+                f.close()
             menu_config.read(f"{appPath}/config/menu.ini")
             group_items = menu_config.get('groups', 'items').strip('"').split(",")
             for group in group_items:
@@ -73,13 +75,13 @@ class AppWindow(Gtk.ApplicationWindow):
                     if 'run' in menu_config.options(btn_item):
                         run_command = menu_config.get(btn_item, 'run').strip('"')
                         button.connect("clicked", self.run_command, f'{appPath}{run_command}')
-                    elif 'box_yes' in menu_config.options(btn_item):
-                        button.connect("clicked", self.messagebox, 1, menu_config.get())
 
                     box.pack_start(button, True, True, 0)
                 self.notebook.append_page(box, Gtk.Label(label=tab_name))
-        except BaseException:
-            self.show_error_dialog("Error: 找不到菜单或无法读取菜单! \n(code: 128)")
+            
+                
+        except Exception as e:
+            self.show_error_dialog(f"Error: 找不到菜单或读取菜单时出现错误! 报错如下: \n{e}")
             quit()
 
     def on_quit(self, widget):  
@@ -210,7 +212,6 @@ def run_outside_command(command):
     process = subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 if __name__ == "__main__":  
-    
     options()
     app = Application()  
     exit_status = app.run(sys.argv)  

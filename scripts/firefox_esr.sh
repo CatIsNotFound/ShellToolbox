@@ -24,16 +24,37 @@ if [ -f /usr/bin/snap ];then
 fi
 
 # 检查 apt 是否已存在 firefox
-echo "正在检查更新..."
-sudo apt update > /dev/null
+echo "正在检查..."
+sudo apt-get update > /dev/null
 if [ $? -ne 0 ];then
-    echo "Error: 更新失败, 请检查网络!"
+    echo "Error: 获取失败, 请检查网络!"
     read -p "按任意键以结束执行..."
 fi
-if [ $(apt search firefox-esr --names-only | wc -l) -gt 2 ];then
+if [ $(apt list firefox --installed 2> /dev/null | wc -l) -gt 1 ];then
+    echo -e "\033[33m警告: 检测到当前系统上已安装 Firefox, 但这可能是\033[1m旧版本的 Firefox\033[0m"
+    read -p "是否确认移除 Firefox 并安装 Firefox ESR 版本? (y/n) " opt
+    if [[ $opt == 'y' || $opt == 'Y' ]];then
+        echo "正在移除 Firefox..."
+        sudo apt-get purge firefox -y
+    fi
+fi
+if [ $(apt list firefox-esr* --installed 2> /dev/null | wc -l) -ge 2 ];then
+    echo "检测到您已安装 Firefox ESR 版本, 你希望选择卸载还是更新? "
+    read -p "输入 [remove] 以确认卸载, 或按任意键以检查更新. (remove) " opt
+    if [[ $opt == 'remove' ]];then
+        echo "正在移除 Firefox ESR..."
+        sudo apt-get purge firefox-esr -y &> /dev/null
+        echo "已移除 Firefox ESR, 即将结束执行..."
+        sleep 3s
+        exit 0
+    fi
+fi
+
+if [ $(apt search firefox-esr --names-only 2> /dev/null | wc -l) -gt 2 ];then
+    echo "正在下载更新 Firefox ESR..."
     sudo apt-get install firefox-esr firefox-esr-l10n-zh-cn -y &> /dev/null
     if [ $? -eq 0 ];then
-        echo "已安装或更新 Firefox ESR 版本, 即将结束执行..."
+        echo "已安装更新 Firefox ESR, 即将结束执行..."
         sleep 3s
         exit 0
     fi

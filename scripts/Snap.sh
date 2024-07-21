@@ -50,14 +50,17 @@ function install_snap() {
         read -p "按任意键以结束执行..."
         exit 1
     fi
-    echo "(2) 正在安装 Ubuntu Store, 这需要较长的时间..."
-    sudo snap install snap-store > /dev/null
-    if [ $? -ne 0 ];then
-        echo "Error: 下载安装 Ubuntu Store 失败!"
-        read -p "按任意键以结束执行..."
-        exit 1
+    read -p "是否安装 Snap Store 吗? 10 秒后将自动取消安装. (Y/N) " -t 10 opt
+    if [[ $opt == 'y' || $opt == 'Y' ]];then
+        echo "(2) 正在安装 Snap Store, 这需要较长的时间..."
+        sudo snap install snap-store > /dev/null
+        if [ $? -ne 0 ];then
+            echo "Error: 下载安装 Ubuntu Store 失败!"
+            read -p "按任意键以结束执行..."
+            exit 1
+        fi
     fi
-    echo -n "已安装 Snap, 是否额外安装 Firefox Snap 版本吗? 10 秒后将自动取消安装 Firefox. "
+    echo -n "是否额外安装 Firefox Snap 版本吗? 10 秒后将自动取消安装. "
     read -p '(Y/N)' -t 10 opt
     if [[ $opt == 'y' || $opt == 'Y' ]];then
         echo "(3) 正在安装 Firefox Snap 版本..."

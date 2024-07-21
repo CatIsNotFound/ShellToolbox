@@ -22,7 +22,7 @@ class Preference(Gtk.Window):
             self.terminal_combo.append_text(f"{t_name}")
         if terminal == 'gnome': 
             n = 0
-        elif terminal == 'kde': 
+        elif terminal == 'plasma': 
             n = 1
         elif terminal == 'xfce4': 
             n = 2
@@ -30,7 +30,6 @@ class Preference(Gtk.Window):
             n = 3
         else: 
             n = 4
-        print(terminal, n)
         self.terminal_combo.set_active(n)  # 设置默认选项  
         self.terminal_combo.connect("changed", self.on_terminal_combo_changed) 
   
@@ -71,7 +70,7 @@ class Preference(Gtk.Window):
         if selected_terminal == "Gnome Terminal":
             terminal = 'gnome'
         elif selected_terminal == "Konsole":
-            terminal = 'kde'
+            terminal = 'plasma'
         elif selected_terminal == "Xfce4 Terminal":
             terminal = 'xfce4'
         elif selected_terminal == "QTerminal":
