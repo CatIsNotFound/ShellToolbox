@@ -1,4 +1,0 @@
-# python3 scripts/browser.py Google Chrome google-chrome-stable https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-# gnome-terminal -- scripts/browser.sh 'Google Chrome' google-chrome-stable https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-# scripts/browser.sh Microsoft Edge microsoft-edge-stable https://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-stable/microsoft-edge-stable_126.0.2592.102-1_amd64.deb?brand=M102
-scripts/start_script.sh gnome scripts/browser.sh Google_Chrome google-chrome-stable https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
