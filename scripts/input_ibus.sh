@@ -145,7 +145,7 @@ EOF
 
 if [ -f /usr/bin/ibus ];then
     echo -e "需要对 iBus 输入法做什么？"
-    select option in 安装拼音 更新 移除 配置 测试 重新启动; do
+    select option in 安装拼音 更新 移除 配置 测试 重新启动 退出; do
         case $option in
             安装拼音)
                 install_ibus
@@ -166,6 +166,9 @@ if [ -f /usr/bin/ibus ];then
                 ;;
             重新启动)
                 repair_ibus
+                ;;
+            退出)
+                exit 0
                 ;;
         esac
     done

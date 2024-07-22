@@ -30,8 +30,14 @@ function remove_snap() {
     cd ..
     rm -rf .cache_snap
     echo "(2) 正在移除 Snap..."
-    sudo apt autopurge snapd -y
-
+    sudo apt-get purge snapd -y
+    if [ $? -ne 0 ];then
+        echo "正在重试..."
+        sudo rm -rf /var/lib/dpkg/lock*
+        sleep 1s
+        sudo apt-get purge snapd -y
+    fi
+    sudo apt-get autoremove -y
     echo "已完全移除 Snap，3 秒后将自动关闭"
     sleep 3s
     exit 0
@@ -44,7 +50,7 @@ function install_snap() {
         exit 1
     fi
     echo "(1) 正在安装 Snap..."
-    sudo apt install snapd -y
+    sudo apt-get install snapd -y
     if [ $? -ne 0 ];then
         echo "Error: 下载安装 Snap 失败!"
         read -p "按任意键以结束执行..."
