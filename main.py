@@ -100,10 +100,11 @@ class AppWindow(Gtk.ApplicationWindow):
             run_outside_command(f"gnome-www-browser -- {url}")
     
     def get_version(self, widget):
-        self.show_info_dialog("版本号: 0.1.0\n使用 Bash Shell 编写脚本\n使用 GTK 3+ 编写 UI")
+        self.show_info_dialog(f"版本号: {app_version}\n作者: CatIsNotFound\n使用 Bash Shell 编写脚本\n使用 GTK 3+ 编写 UI")
     
     def get_newer_version(self, widget):
         self.show_info_dialog("此版本下暂不支持检查更新, 请前往 Github Release 页面下载.")
+        self.on_open_web(self.on_open_web, "")
 
 
     # 执行程序
@@ -211,8 +212,9 @@ def get_output(command):
 def run_outside_command(command):
     subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     
-
-if __name__ == "__main__":  
+def start(version):
+    global app_version
+    app_version = version
     options()
     app = Application()  
     exit_status = app.run(sys.argv)  
