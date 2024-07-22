@@ -6,8 +6,19 @@
 
 ## 安装方法
 
-请从 Github Release 页面下载并安装即可.
+请从 Github Release 页面下载并解压缩即可.
 
-## 使用方法
+## 用法 & QA
 
-直接在桌面上打开 [Shell Toolbox] 工具即可.
+在终端下执行如下命令:
+
+```shell
+./shtools 
+```
+
+若出现无法打开且无法执行脚本的情况, 请尝试执行如下:
+
+```shell
+./shtools --repair
+./shtools --clear
+```
