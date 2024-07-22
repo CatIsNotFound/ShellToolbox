@@ -8,7 +8,7 @@ import preference
 class AppWindow(Gtk.ApplicationWindow):  
     def __init__(self, *args, **kwargs):  
         super().__init__(*args, **kwargs)  
-        self.set_title("快捷工具箱")  
+        self.set_title("Shell Toolbox")  
         self.set_default_size(600, 180)  
         
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)  

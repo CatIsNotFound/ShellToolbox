@@ -19,16 +19,16 @@ function remove_snap() {
     sleep 3s
     mkdir .cache_snap
     cd .cache_snap
-    touch $(snap list | grep -v 名称 | cut -d ' ' -f1)
+    touch $(snap list | grep -v Name | cut -d ' ' -f1)
     count=$(ls -1 | wc -l)
     i=1
     for pack in $(ls -r);do
         echo "正在移除 ($i/$count): $pack"
-        sudo snap remove $pack > /dev/null
+        sudo snap remove $pack &> /dev/null
         i=$(( i+1 ))
     done
     cd ..
-
+    rm -rf .cache_snap
     echo "(2) 正在移除 Snap..."
     sudo apt autopurge snapd -y
 

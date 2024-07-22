@@ -7,3 +7,7 @@ if [ $? -ne 0 ];then
 fi
 sleep 1s
 sudo apt install $1 -y
+if [ $? -ne 0 ];then
+    echo "Error: 安装时出现错误!"
+    read -p "按任意键以结束执行." 
+fi
