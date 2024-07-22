@@ -209,7 +209,8 @@ def get_output(command):
     return output.strip()
 
 def run_outside_command(command):
-    process = subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    
 
 if __name__ == "__main__":  
     options()

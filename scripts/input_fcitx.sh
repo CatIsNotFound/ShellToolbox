@@ -4,7 +4,7 @@
 function setup_fcitx() {
     echo "正在启动 $1..."
     $1 -d &> /dev/null
-    read -p "是否需要打开配置工具? 等待 5 秒或按任意键以跳过此项. (yes) " -t 5 OPT
+    read -p "是否需要打开配置工具? 输入 "yes" 以打开或按任意键以跳过此项. (yes) " OPT
     if [[ $OPT == 'yes' ]];then
         echo "正在打开配置工具..."
         $1-configtool

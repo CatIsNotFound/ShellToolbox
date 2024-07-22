@@ -36,6 +36,8 @@ if [ $(apt list firefox --installed 2> /dev/null | wc -l) -gt 1 ];then
     if [[ $opt == 'y' || $opt == 'Y' ]];then
         echo "正在移除 Firefox..."
         sudo apt-get purge firefox -y
+    else
+        exit 0
     fi
 fi
 if [ $(apt list firefox-esr* --installed 2> /dev/null | wc -l) -ge 2 ];then
