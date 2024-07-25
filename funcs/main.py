@@ -2,7 +2,7 @@ import gi
 gi.require_version('Gtk', '3.0')  
 from gi.repository import Gtk 
 import sys, subprocess, os, configparser
-import preference
+from funcs import preference
 
 
 class AppWindow(Gtk.ApplicationWindow):  
@@ -118,7 +118,7 @@ class AppWindow(Gtk.ApplicationWindow):
     def run_command(self, widget, command):
         err = self.open_terminal(terminal, command)
         if err == 128:
-            self.show_error_dialog(button_text="错误：找不到打开的终端！")
+            self.show_error_dialog(button_text="错误：找不到打开的终端或当前系统没有安装此终端！")
     
     # 执行外部程序
     def run_subProcess(self, widget, command, window_type='', text=""):

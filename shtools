@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import os
 from sys import argv
-import main, preference
+from funcs import main, preference
 if __name__ == '__main__':
     VERSION = '0.1.1'
     if len(argv) != 1:

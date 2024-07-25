@@ -7,7 +7,7 @@ from gi.repository import Gtk
 class Preference(Gtk.Window):  
     def __init__(self):  
         super(Preference, self).__init__(title="首选项")  
-        self.set_default_size(400, 180)
+        self.set_default_size(400, 150)
   
         # 创建“软体位置”标签和输入框
         self.label_software_location = Gtk.Label(label="定义位置")  
@@ -44,15 +44,23 @@ class Preference(Gtk.Window):
         # 创建布局容器  
         self.vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)  
         # 将组件添加到布局容器中  
-        self.vbox.pack_start(self.label_software_location, False, False, 0)  
-        self.vbox.pack_start(self.entry_software_location, False, False, 0)  
-        self.vbox.pack_start(self.label_select_terminal, False, False, 0)
-        self.vbox.pack_start(self.terminal_combo, False, False, 0)
+        # self.vbox.pack_start(self.label_software_location, False, False, 0)  
+        # self.vbox.pack_start(self.entry_software_location, False, False, 0)  
+        # self.vbox.pack_start(self.label_select_terminal, False, False, 0)
+        # self.vbox.pack_start(self.terminal_combo, False, False, 0)
 
-        self.hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        self.hbox.pack_end(self.button_save_settings, False, False, 0)
-        self.hbox.pack_end(self.button_cancel, False, False, 0)
-        self.vbox.pack_end(self.hbox, False, False, 0)
+        self.hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
+        self.hbox.pack_end(self.button_save_settings, False, False, 10)
+        self.hbox.pack_end(self.button_cancel, False, False, 10)
+        self.hbox1 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
+        self.hbox1.pack_start(self.label_software_location, False, False, 10)
+        self.hbox1.pack_start(self.entry_software_location, False, False, 10)
+        self.hbox2 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
+        self.hbox2.pack_start(self.label_select_terminal, False, False, 10)
+        self.hbox2.pack_start(self.terminal_combo, False, False, 10)
+        self.vbox.pack_start(self.hbox1, False, False, 10)
+        self.vbox.pack_start(self.hbox2, False, False, 5)
+        self.vbox.pack_end(self.hbox, False, False, 10)
   
         # 将布局容器添加到窗口中  
         self.add(self.vbox)  
