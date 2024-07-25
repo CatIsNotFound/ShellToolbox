@@ -111,7 +111,7 @@ if [ ! -f /usr/bin/$1 ];then
 fi
 
 echo "需要对 $1 做什么？(选择数字键)"
-select OPT in 更新 配置 重启 卸载 退出; do
+select OPT in 更新 配置 修复 重启 卸载 退出; do
     case $OPT in
         更新)
             install_fcitx $1
@@ -127,6 +127,9 @@ select OPT in 更新 配置 重启 卸载 退出; do
                 echo "正在打开输入法配置..."
                 im-config
             fi
+            ;;
+        修复)
+            setup_fcitx
             ;;
         重启)
             echo "正在重启 $1..."

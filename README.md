@@ -6,7 +6,7 @@
 
 ## 安装方法
 
-请从 Github Release 页面下载并解压缩即可.
+请从 [Github Release](https://github.com/CatIsNotFound/ShellToolbox/releases) 页面下载并解压缩即可.
 
 ## 用法 & QA
 

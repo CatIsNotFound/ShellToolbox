@@ -75,6 +75,12 @@ class AppWindow(Gtk.ApplicationWindow):
                     if 'run' in menu_config.options(btn_item):
                         run_command = menu_config.get(btn_item, 'run').strip('"')
                         button.connect("clicked", self.run_command, f'{appPath}{run_command}')
+                    elif 'exec' in menu_config.options(btn_item):
+                        run_command = menu_config.get(btn_item, 'exec').strip('"')
+                        if 'warning' in menu_config.options(btn_item):
+                            warn_text = menu_config.get(btn_item, 'warning').strip('"')
+                            button.connect("clicked", self.run_subProcess, run_command, 'warning', warn_text)
+                        button.connect("clicked", self.run_subProcess, run_command)
 
                     box.pack_start(button, True, True, 0)
                 self.notebook.append_page(box, Gtk.Label(label=tab_name))
@@ -104,7 +110,7 @@ class AppWindow(Gtk.ApplicationWindow):
     
     def get_newer_version(self, widget):
         self.show_info_dialog("此版本下暂不支持检查更新, 请前往 Github Release 页面下载.")
-        self.on_open_web(self.on_open_web, "")
+        self.on_open_web(self.on_open_web, "https://github.com/CatIsNotFound/ShellToolbox/releases")
 
 
     # 执行程序
@@ -112,6 +118,12 @@ class AppWindow(Gtk.ApplicationWindow):
         err = self.open_terminal(terminal, command)
         if err == 128:
             self.show_error_dialog(button_text="错误：找不到打开的终端！")
+    
+    # 执行外部程序
+    def run_subProcess(self, widget, command, window_type='', text=""):
+        if window_type == 'warning':
+            self.show_warning_dialog(text)
+        get_output(command)
 
     # 打开后台终端并执行脚本
     def open_terminal(self, terminal, operation):

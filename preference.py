@@ -108,5 +108,3 @@ def main(setup_path):
     Gtk.main()
     return return_conf
   
-if __name__ == "__main__":  
-    main("config/setup.ini")
