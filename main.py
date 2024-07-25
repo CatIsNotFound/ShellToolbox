@@ -79,8 +79,9 @@ class AppWindow(Gtk.ApplicationWindow):
                         run_command = menu_config.get(btn_item, 'exec').strip('"')
                         if 'warning' in menu_config.options(btn_item):
                             warn_text = menu_config.get(btn_item, 'warning').strip('"')
-                            button.connect("clicked", self.run_subProcess, run_command, 'warning', warn_text)
-                        button.connect("clicked", self.run_subProcess, run_command)
+                            button.connect("clicked", self.run_subProcess, run_command, "warn", f"{warn_text}")
+                        else:
+                            button.connect("clicked", self.run_subProcess, run_command)
 
                     box.pack_start(button, True, True, 0)
                 self.notebook.append_page(box, Gtk.Label(label=tab_name))
@@ -121,9 +122,11 @@ class AppWindow(Gtk.ApplicationWindow):
     
     # 执行外部程序
     def run_subProcess(self, widget, command, window_type='', text=""):
-        if window_type == 'warning':
+        if window_type == 'warn':
             self.show_warning_dialog(text)
-        get_output(command)
+        err = get_output(command, "stderr")
+        if err != "":
+            self.show_error_dialog(f"执行时发生错误, 输出内容如下: \n{err}")
 
     # 打开后台终端并执行脚本
     def open_terminal(self, terminal, operation):
@@ -164,7 +167,7 @@ class AppWindow(Gtk.ApplicationWindow):
         error_dialog.destroy()  
     
     # 显示警告对话框
-    def show_warning_dialog(self, widget, button_text):
+    def show_warning_dialog(self, button_text):
         warning_dialog = Gtk.MessageDialog(self,  
                                          0,  
                                          Gtk.MessageType.WARNING,  
@@ -215,11 +218,16 @@ def options():
             config.write(file)
         file.close()
 
-def get_output(command):
+def get_output(command, outputmode="stdout"):
     process = subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    output = process.stdout.readline().decode('utf-8')
+    stderr = process.stderr.readline().decode('utf-8')
+    stdout = process.stdout.readline().decode('utf-8')
     process.wait()
-    return output.strip()
+    if outputmode == 'stdout':
+        return stdout.strip()
+    elif outputmode == 'stderr':
+        return stderr.strip()
+
 
 def run_outside_command(command):
     subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
