@@ -3,7 +3,7 @@ import os
 from sys import argv
 from funcs import main, preference
 if __name__ == '__main__':
-    VERSION = '0.1.1'
+    VERSION = '0.1.2'
     if len(argv) != 1:
         if argv[1] == '--clear':
             print("Successful!")
