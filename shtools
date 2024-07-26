@@ -21,7 +21,7 @@ if __name__ == '__main__':
         elif argv[1] == '--preference':
             preference.main("./config/setup.ini")
         elif argv[1] == '--repair':
-            os.system("chmod u+x ./scripts/*.sh")
+            os.system("chmod -R u+x ./scripts/*.sh ./scripts/*/*.sh")
             print("Successful!")
         elif argv[1] == '--reset':
             os.system("rm -rf ./config/setup.ini")
