@@ -4,30 +4,37 @@ from sys import argv
 from funcs import main, preference
 if __name__ == '__main__':
     VERSION = '0.1.2'
+    VERSION_TYPE = 'Beta'
     if len(argv) != 1:
         if argv[1] == '--clear':
-            print("Successful!")
             os.system("rm -rf ./config/setup.ini")
+            print("Successful!")
         elif argv[1] == '--help':
             print(f"用法: {argv[0]} [选项]")
             print("选项: ")
-            print(f"--clear\t\t清理用户配置选项")
+            print(f"--clear\t\t清理首选项配置")
             print(f"--help\t\t显示帮助")
             print(f"--preference\t显示【首选项】页面")
             print(f"--repair\t解决脚本目录下权限不足的问题")
+            print(f"--reset\t\t恢复默认首选项配置【推荐】")
             print(f"--version\t显示当前版本号")
         elif argv[1] == '--preference':
             preference.main("./config/setup.ini")
         elif argv[1] == '--repair':
             os.system("chmod u+x ./scripts/*.sh")
             print("Successful!")
+        elif argv[1] == '--reset':
+            os.system("rm -rf ./config/setup.ini")
+            main.options()
+            print("Successful!")
         elif argv[1] == '--version':
-            print(f"Shell Toolbox version {VERSION}")
+            print(f"Shell Toolbox v{VERSION}-{VERSION_TYPE}")
             print(f"作者: CatIsNotFound")
             print(f"获取更新? 请访问: https://github.com/CatIsNotFound/ShellToolbox/releases")
         else:
             print(f"未知的选项: {argv[1]}")
-            print(f"尝试执行: {argv[0]} --help")
+            print(f"尝试执行: {argv[0]} --help 查看所有用法.")
         # pass
     else:
-        main.start(VERSION)
+        main.start(VERSION, VERSION_TYPE)
+        

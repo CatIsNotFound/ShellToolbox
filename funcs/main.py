@@ -9,7 +9,8 @@ class AppWindow(Gtk.ApplicationWindow):
     def __init__(self, *args, **kwargs):  
         super().__init__(*args, **kwargs)  
         self.set_title("Shell Toolbox")  
-        self.set_default_size(600, 180)  
+        # self.set_default_size(600, 180)
+        self.set_resizable(False)  
         
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)  
         self.add(box)
@@ -85,8 +86,10 @@ class AppWindow(Gtk.ApplicationWindow):
 
                     box.pack_start(button, True, True, 0)
                 self.notebook.append_page(box, Gtk.Label(label=tab_name))
+            if os.geteuid() == 0:
+                self.show_warning_dialog("警告: 你正在以管理员身份（或 root 身份）运行工具箱, \n已被禁止使用! ")
+                quit()
             
-                
         except Exception as e:
             self.show_error_dialog(f"Error: 找不到菜单或读取菜单时出现错误! 报错如下: \n{e}")
             quit()
@@ -107,7 +110,7 @@ class AppWindow(Gtk.ApplicationWindow):
             run_outside_command(f"gnome-www-browser -- {url}")
     
     def get_version(self, widget):
-        self.show_info_dialog(f"版本号: {app_version}\n作者: CatIsNotFound\n使用 Bash Shell 编写脚本\n使用 GTK 3+ 编写 UI")
+        self.show_info_dialog(f"版本号: {app_version}_{version_type}\n作者: CatIsNotFound\n使用 Bash Shell 编写脚本\n使用 GTK 3+ 编写 UI")
     
     def get_newer_version(self, widget):
         self.show_info_dialog("此版本下暂不支持检查更新, 请前往 Github Release 页面下载.")
@@ -232,9 +235,11 @@ def get_output(command, outputmode="stdout"):
 def run_outside_command(command):
     subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     
-def start(version):
+def start(version, ver_type):
     global app_version
+    global version_type
     app_version = version
+    version_type = ver_type
     options()
     app = Application()  
     exit_status = app.run(sys.argv)  
