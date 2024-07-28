@@ -30,7 +30,7 @@ test_ibus() {
     if [[ $opt == 'y' || $opt == 'Y' ]];then
         repair_ibus
     fi
-    read -p "是否尝试写入 ibus 环境? (y/n) " opt
+    read -p "是否尝试修复 ibus? (y/n) " opt
     if [[ $opt == 'y' || $opt == 'Y' ]];then
         repair_ibus env
     fi
@@ -118,6 +118,21 @@ export XMODIFIERS=ibus
 export QT_IM_MODULE=ibus
 EOF
         sleep 1s
+        echo "正在设置启动项..."
+        cat > $HOME/.config/autostart/ibus.desktop << EOF
+[Desktop Entry]
+Type=Application
+Exec=ibus
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name=ibus
+Comment[zh_CN]=启动 ibus 输入法
+Comment[zh_TW]=啓動 ibus 輸入法
+Comment[zh_HK]=啓動 ibus 輸入法
+Comment=Startup ibus input method
+EOF
+        sleep 1s
         echo -e "\033[33m注意: 请按下 \033[1mCtrl + Alt + Delete\033[0m\033[33m 以注销当前用户并重新登录以生效配置.\033[0m "
         read -p "请按任意键以结束..."
         exit 0
@@ -172,7 +187,7 @@ check_fcitx() {
 
 if [ -f /usr/bin/ibus ];then
     echo -e "需要对 iBus 输入法做什么？"
-    select option in 安装拼音 更新 移除 配置 测试 重新启动 退出; do
+    select option in 安装拼音 更新 移除 配置 测试 修复 重新启动 退出; do
         case $option in
             安装拼音)
                 install_ibus
@@ -190,6 +205,9 @@ if [ -f /usr/bin/ibus ];then
                 while $1; do
                     test_ibus
                 done
+                ;;
+            修复)
+                repair_ibus env
                 ;;
             重新启动)
                 repair_ibus

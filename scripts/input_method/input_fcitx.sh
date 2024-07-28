@@ -15,9 +15,16 @@ function setup_fcitx() {
 export GTK_IM_MODULE=$1
 export XMODIFIERS=$1
 export QT_IM_MODULE=$1
-$1 -d &> /dev/null
 EOF
     sleep 1s
+    echo "正在设置开机启动项..."
+    mkdir $HOME/.config/autostart/ 2> /dev/null
+    if [[ $1 == 'fcitx5' ]];then
+        cp -a /usr/share/applications/*Fcitx5.desktop $HOME/.config/autostart/
+    elif [[ $1 == 'fcitx' ]];then
+        cp -a /usr/share/applications/*fcitx.desktop $HOME/.config/autostart/
+    fi
+
     echo -e "已安装与配置 $1, 请\033[1m手动注销并重新登录桌面\033[0m."
     echo -e "\033[33m注意: 按下 \033[1mCtrl + Alt + Delete\033[0m\033[33m 以手动注销并重新登录以生效配置.\033[0m "
     read -p "请按任意键以结束..."
@@ -117,11 +124,8 @@ select OPT in 更新 配置 修复 重启 卸载 退出; do
             install_fcitx $1
             ;;
         配置)
-            read -p "需要打开配置工具吗? (y/n) " OPT
-            if [[ $OPT == 'y' ]];then
-                echo "正在打开配置工具..."
-                $1-configtool
-            fi
+            echo "正在打开配置工具..."
+            $1-configtool
             read -p "需要打开输入法配置吗? (y/n) " OPT
             if [[ $OPT == 'y' ]];then
                 echo "正在打开输入法配置..."
