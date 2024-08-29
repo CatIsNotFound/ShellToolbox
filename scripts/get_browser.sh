@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ -f /usr/bin/firefox ];then
+if [ -f /*/bin/firefox* ];then
     echo -n "firefox"
 elif [ -f /usr/bin/gnome-www-browser ];then
     echo -n "www"

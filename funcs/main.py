@@ -54,7 +54,7 @@ class AppWindow(Gtk.ApplicationWindow):
 
         # "帮助" 菜单项
         readme_item = Gtk.MenuItem(label="查看 README")
-        readme_item.connect("activate", self.on_open_web, "")
+        readme_item.connect("activate", self.on_open_web, "https://github.com/CatIsNotFound/ShellToolbox")
         help_menu_dropdown.append(readme_item)
         github_item = Gtk.MenuItem(label="查看 Github 仓库")
         github_item.connect("activate", self.on_open_web, "https://github.com/CatIsNotFound/ShellToolbox")
@@ -121,10 +121,9 @@ class AppWindow(Gtk.ApplicationWindow):
         n = self.show_question_dialog("即将使用浏览器访问外部网页，是否前往? ")
         if n == 1:
             if browser == 'firefox':
-                run_outside_command(f"/usr/bin/firefox* {url}")
+                run_outside_command(f"/*/bin/firefox* {url}", True)
             elif browser == 'www':
                 run_outside_command(f"gnome-www-browser -- {url}")
-            pass
 
     def get_version(self, widget):
         self.show_info_dialog(f"版本号: {app_version}_{version_type}\n作者: CatIsNotFound\n使用 Bash Shell 编写脚本\n使用 GTK 3+ 编写 UI")
@@ -255,8 +254,8 @@ def get_output(command, outputmode="stdout"):
         return process.returncode()
 
 
-def run_outside_command(command):
-    subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+def run_outside_command(command, isShell=False):
+    subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=isShell)
     
 def start(version, ver_type):
     global app_version
