@@ -1,7 +1,7 @@
 #!/bin/bash
-# Install Firefox ESR
+# Install Firefox
 
-echo "开始下载安装 Firefox ESR..."
+echo "开始下载安装 Firefox..."
 echo -e "\033[1;31m注意: 执行此操作前，请输入用户密码以确认执行操作!\033[0m"
 sudo echo ":已提权:"
 if [ $? -ne 0 ];then
@@ -16,7 +16,7 @@ if [ -f /usr/bin/snap ];then
             echo "正在移除 Firefox, 这需要一点时间..."
             sudo snap remove firefox > /dev/null
         else
-            echo "正在取消安装 Firefox ESR..."
+            echo "正在取消安装 Firefox..."
             sleep 3s
             exit 0
         fi
@@ -30,39 +30,43 @@ if [ $? -ne 0 ];then
     echo "Error: 获取失败, 请检查网络!"
     read -p "按任意键以结束执行..."
 fi
+
+if [ $(snap list | grep firefox | wc -l) -gt  ]
+
 if [ $(apt list firefox --installed 2> /dev/null | wc -l) -gt 1 ];then
-    echo -e "\033[33m警告: 检测到当前系统上已安装 Firefox, \033[0m"
-    read -p "是否确认移除 Firefox 并安装 Firefox ESR 版本? (y/n) " opt
-    if [[ $opt == 'y' || $opt == 'Y' ]];then
-        echo "正在移除 Firefox..."
+    echo -e "\033[33m警告: 检测到当前系统上已安装 Firefox.\033[0m "
+    echo "输入 remove 移除 Firefox, 输入 update 以下载更新 Firefox."
+    read -p "请输入执行... [remove | update] (update) " opt
+    if [[ $opt == 'remove' ]];then
+        echo "正在移除已安装的 Firefox..."
         sudo apt-get purge firefox -y
     else
-        exit 0
+        sudo apt-get install firefox firefox-l10n-zh-cn -y &> /dev/null
     fi
 fi
 if [ $(apt list firefox-esr* --installed 2> /dev/null | wc -l) -ge 2 ];then
-    echo "检测到您已安装 Firefox ESR 版本, 你希望选择卸载还是更新? "
-    read -p "输入 [remove] 以确认卸载, 或按任意键以检查更新. (remove) " opt
-    if [[ $opt == 'remove' ]];then
+    echo "检测到您已安装 Firefox ESR 版本, 你希望选择卸载并安装 Firefox 吗? "
+    read -p "输入 yes 以确认卸载并安装 Firefox. " opt
+    if [[ $opt == 'yes' ]];then
         echo "正在移除 Firefox ESR..."
         sudo apt-get purge firefox-esr -y &> /dev/null
-        echo "已移除 Firefox ESR, 即将结束执行..."
+        echo "已安装 Firefox, 即将结束执行..."
         sleep 3s
         exit 0
     fi
 fi
 
-if [ $(apt search firefox-esr --names-only 2> /dev/null | wc -l) -gt 2 ];then
-    echo "正在下载更新 Firefox ESR..."
-    sudo apt-get install firefox-esr firefox-esr-l10n-zh-cn -y &> /dev/null
+if [ $(apt search firefox --names-only 2> /dev/null | wc -l) -gt 2 ];then
+    echo "正在下载更新 Firefox..."
+    sudo apt-get install firefox firefox-l10n-zh-cn -y &> /dev/null
     if [ $? -eq 0 ];then
-        echo "已安装更新 Firefox ESR, 即将结束执行..."
+        echo "已安装更新 Firefox, 即将结束执行..."
         sleep 3s
         exit 0
     fi
 fi
 
-# 下载 Firefox ESR 版本
+# 下载 Firefox 版本
 echo "(1) 正在获取并添加密钥..."
 sudo install -d -m 0755 /etc/apt/keyrings
 wget -q https://packages.mozilla.org/apt/repo-signing-key.gpg -O- | sudo tee /etc/apt/keyrings/packages.mozilla.org.asc > /dev/null
@@ -82,12 +86,12 @@ if [ $? -ne 0 ];then
     echo "Error: 更新失败, 请检查网络!"
     read -p "按任意键以结束执行..."
 fi
-echo "(3) 正在下载 Firefox ESR 及简体中文语言包..."
-sudo apt-get install firefox-esr firefox-esr-l10n-zh-cn -y > /dev/null
+echo "(3) 正在下载 Firefox 及简体中文语言包..."
+sudo apt-get install firefox firefox-l10n-zh-cn -y > /dev/null
 if [ $? -ne 0 ];then
     echo "Error: 下载安装时出现错误!"
     read -p "按任意键以结束执行..."
 fi
-echo "已安装 Firefox ESR 版本, 即将结束执行..."
+echo "已安装 Firefox 版本, 即将结束执行..."
 sleep 3s
 exit 0

@@ -8,4 +8,3 @@ elif [ -f /usr/bin/xfce4-terminal ];then
 elif [ -f /usr/bin/qterminal ];then
     echo -n "qt"
 fi
-echo $@

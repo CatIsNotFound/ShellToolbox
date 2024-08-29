@@ -33,7 +33,22 @@ class Preference(Gtk.Window):
             n = 4
         self.terminal_combo.set_active(n)  # 设置默认选项  
         self.terminal_combo.connect("changed", self.on_terminal_combo_changed) 
-  
+
+        # 创建"打开浏览器方式"选项
+        self.label_select_browser = Gtk.Label(label="浏览方式")  
+        self.browser_combo = Gtk.ComboBoxText()  
+        browsers = ["Firefox 全版本", "Chrome/Chromium/Edge", "<unknown>"]  
+        for t_name in browsers:  
+            self.browser_combo.append_text(f"{t_name}")
+        if browser == 'firefox': 
+            n = 0
+        elif browser == 'www': 
+            n = 1
+        else:
+            n = 2
+        self.browser_combo.set_active(n)  # 设置默认选项  
+        self.browser_combo.connect("changed", self.on_browser_combo_changed) 
+
         # 创建“保存设置”按钮  
         self.button_save_settings = Gtk.Button(label="保存设置")  
         self.button_save_settings.connect("clicked", self.on_save_settings)  
@@ -59,8 +74,13 @@ class Preference(Gtk.Window):
         self.hbox2 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
         self.hbox2.pack_start(self.label_select_terminal, False, False, 10)
         self.hbox2.pack_start(self.terminal_combo, False, False, 5)
-        self.vbox.pack_start(self.hbox1, False, False, 10)
+        self.hbox3 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
+        self.hbox3.pack_start(self.label_select_browser, False, False, 10)
+        self.hbox3.pack_start(self.browser_combo, False, False, 5)
+
+        self.vbox.pack_start(self.hbox1, False, False, 5)
         self.vbox.pack_start(self.hbox2, False, False, 5)
+        self.vbox.pack_start(self.hbox3, False, False, 5)
         self.vbox.pack_end(self.hbox, False, False, 10)
   
         # 将布局容器添加到窗口中  
@@ -87,6 +107,17 @@ class Preference(Gtk.Window):
         else:
             terminal = 'other'
         config.set('Config', 'terminal', terminal)
+    
+    def on_browser_combo_changed(self, widget):
+        active = widget.get_active()  
+        selected_browser = widget.get_active_text()  
+        if selected_browser == "Firefox 全版本":
+            browser = 'firefox'
+        elif selected_browser == "Chrome/Chromium/Edge":
+            browser = 'www'
+        else:
+            browser = 'unknown'
+        config.set('Config', 'browser', browser)
 
     def on_save_settings(self, widget):  
         # 保存设置的代码将在这里实现  
@@ -104,9 +135,11 @@ def load_config(config_path):
     global config
     config = configparser.ConfigParser()
     global terminal
+    global browser
     global appPath
     config.read(config_path)
     terminal = config.get('Config', 'terminal')
+    browser = config.get('Config', 'browser')
     appPath = config.get('Config', 'appPath')
     return config
 

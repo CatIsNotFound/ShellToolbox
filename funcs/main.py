@@ -1,3 +1,4 @@
+from time import sleep
 import gi  
 gi.require_version('Gtk', '3.0')  
 from gi.repository import Gtk 
@@ -32,7 +33,19 @@ class AppWindow(Gtk.ApplicationWindow):
         quit_item = Gtk.MenuItem(label="退出")  
         quit_item.connect("activate", self.on_quit)  
         file_menu_dropdown.append(quit_item) 
+
+        # # "工具" 菜单栏
+        # tools_menu = Gtk.MenuItem(label="额外工具")  
+        # menu_bar.append(tools_menu)  
+        # tools_menu_dropdown = Gtk.Menu()  
+        # tools_menu.set_submenu(tools_menu_dropdown)   
         
+        # # "工具" 菜单项
+        # hosts_item = Gtk.MenuItem(label="Hosts 文件编辑器")  
+        # hosts_item.connect("activate", self.run_hosts_file)  
+        # tools_menu_dropdown.append(hosts_item)
+        
+
         # "帮助" 菜单栏
         help_menu = Gtk.MenuItem(label="帮助")  
         menu_bar.append(help_menu)  
@@ -107,8 +120,13 @@ class AppWindow(Gtk.ApplicationWindow):
     def on_open_web(self, widget, url):
         n = self.show_question_dialog("即将使用浏览器访问外部网页，是否前往? ")
         if n == 1:
-            run_outside_command(f"gnome-www-browser -- {url}")
-    
+            if browser == 'firefox':
+                run_outside_command(f"/usr/bin/firefox* {url}")
+            elif browser == 'www':
+                run_outside_command(f"gnome-www-browser -- {url}")
+            pass
+       
+
     def get_version(self, widget):
         self.show_info_dialog(f"版本号: {app_version}_{version_type}\n作者: CatIsNotFound\n使用 Bash Shell 编写脚本\n使用 GTK 3+ 编写 UI")
     
@@ -204,19 +222,23 @@ class Application(Gtk.Application):
 def options():
     global config
     global terminal
+    global browser
     global appPath
     config = configparser.ConfigParser()
     if os.path.exists("config/setup.ini"):
         config.read('config/setup.ini')
         terminal = config.get('Config', 'terminal')
         appPath = config.get('Config', 'appPath')
+        browser = config.get('Config', 'browser')
     else:
         # run_subprocess("sudo chmod -R u+x ./scripts/*.sh")
         appPath = get_output("pwd")
         terminal = get_output(f"{appPath}/scripts/get_terminal.sh")
+        browser = get_output(f"{appPath}/scripts/get_browser.sh")
         config.add_section("Config")
         config.set("Config", "appPath", appPath)
         config.set("Config", "terminal", terminal)
+        config.set("Config", "browser", browser)
         with open(f"{appPath}/config/setup.ini", 'w', encoding='utf-8') as file:
             config.write(file)
         file.close()
@@ -230,6 +252,8 @@ def get_output(command, outputmode="stdout"):
         return stdout.strip()
     elif outputmode == 'stderr':
         return stderr.strip()
+    elif outputmode == 'return':
+        return process.returncode()
 
 
 def run_outside_command(command):
