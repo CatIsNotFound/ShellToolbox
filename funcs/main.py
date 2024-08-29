@@ -120,10 +120,16 @@ class AppWindow(Gtk.ApplicationWindow):
     def on_open_web(self, widget, url):
         n = self.show_question_dialog("即将使用浏览器访问外部网页，是否前往? ")
         if n == 1:
-            if browser == 'firefox':
-                run_outside_command(f"/*/bin/firefox* {url}", True)
-            elif browser == 'www':
-                run_outside_command(f"gnome-www-browser -- {url}")
+            # try:
+                if browser == 'firefox':
+                    return_code = run_outside_command(f"/*/bin/firefox* {url}", True)
+                elif browser == 'www':
+                    return_code = run_outside_command(f"gnome-www-browser -- {url}")
+                else:
+                    self.show_error_dialog("无法打开浏览器，请尝试修改 [首选项] >> [浏览方式]")
+            # except Exception as e:
+                if return_code:
+                    self.show_error_dialog(f"打开浏览器时出现错误，报错如下：\n{return_code}")
 
     def get_version(self, widget):
         self.show_info_dialog(f"版本号: {app_version}_{version_type}\n作者: CatIsNotFound\n使用 Bash Shell 编写脚本\n使用 GTK 3+ 编写 UI")
@@ -255,8 +261,15 @@ def get_output(command, outputmode="stdout"):
 
 
 def run_outside_command(command, isShell=False):
-    subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=isShell)
-    
+    process = subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=isShell)
+    try:
+        process.wait(3)
+    except subprocess.TimeoutExpired as e:
+        pass
+
+    # err = process.stderr.readline().decode('utf-8')
+    return process.returncode
+
 def start(version, ver_type):
     global app_version
     global version_type

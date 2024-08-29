@@ -31,12 +31,10 @@ if [ $? -ne 0 ];then
     read -p "按任意键以结束执行..."
 fi
 
-if [ $(snap list | grep firefox | wc -l) -gt  ]
-
 if [ $(apt list firefox --installed 2> /dev/null | wc -l) -gt 1 ];then
     echo -e "\033[33m警告: 检测到当前系统上已安装 Firefox.\033[0m "
-    echo "输入 remove 移除 Firefox, 输入 update 以下载更新 Firefox."
-    read -p "请输入执行... [remove | update] (update) " opt
+    echo "输入 remove 移除 Firefox, 或者直接按下回车键以下载更新 Firefox."
+    read -p "请输入执行... [remove] " opt
     if [[ $opt == 'remove' ]];then
         echo "正在移除已安装的 Firefox..."
         sudo apt-get purge firefox -y
