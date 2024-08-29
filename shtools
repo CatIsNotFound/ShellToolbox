@@ -5,6 +5,7 @@ from funcs import main, preference
 if __name__ == '__main__':
     VERSION = '0.1.3'
     VERSION_TYPE = 'Beta'
+    
     if len(argv) != 1:
         if argv[1] == '--clear':
             os.system("rm -rf ./config/setup.ini")

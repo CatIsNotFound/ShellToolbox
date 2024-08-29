@@ -125,7 +125,6 @@ class AppWindow(Gtk.ApplicationWindow):
             elif browser == 'www':
                 run_outside_command(f"gnome-www-browser -- {url}")
             pass
-       
 
     def get_version(self, widget):
         self.show_info_dialog(f"版本号: {app_version}_{version_type}\n作者: CatIsNotFound\n使用 Bash Shell 编写脚本\n使用 GTK 3+ 编写 UI")
