@@ -37,7 +37,7 @@ class Preference(Gtk.Window):
         # 创建"打开浏览器方式"选项
         self.label_select_browser = Gtk.Label(label="浏览方式")  
         self.browser_combo = Gtk.ComboBoxText()  
-        browsers = ["Firefox 全版本", "Chrome/Chromium/Edge", "<unknown>"]  
+        browsers = ["Firefox 全版本", "Chrome/Edge", "Chromium", "<unknown>"]  
         for t_name in browsers:  
             self.browser_combo.append_text(f"{t_name}")
         if browser == 'firefox': 
@@ -68,9 +68,9 @@ class Preference(Gtk.Window):
         self.hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         self.hbox.pack_end(self.button_save_settings, False, False, 5)
         self.hbox.pack_end(self.button_cancel, False, False, 5)
-        self.hbox1 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
-        self.hbox1.pack_start(self.label_software_location, False, False, 10)
-        self.hbox1.pack_start(self.entry_software_location, False, False, 5)
+        # self.hbox1 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
+        # self.hbox1.pack_start(self.label_software_location, False, False, 10)
+        # self.hbox1.pack_start(self.entry_software_location, False, False, 5)
         self.hbox2 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
         self.hbox2.pack_start(self.label_select_terminal, False, False, 10)
         self.hbox2.pack_start(self.terminal_combo, False, False, 5)
@@ -78,7 +78,7 @@ class Preference(Gtk.Window):
         self.hbox3.pack_start(self.label_select_browser, False, False, 10)
         self.hbox3.pack_start(self.browser_combo, False, False, 5)
 
-        self.vbox.pack_start(self.hbox1, False, False, 5)
+        # self.vbox.pack_start(self.hbox1, False, False, 5)
         self.vbox.pack_start(self.hbox2, False, False, 5)
         self.vbox.pack_start(self.hbox3, False, False, 5)
         self.vbox.pack_end(self.hbox, False, False, 10)
@@ -113,8 +113,10 @@ class Preference(Gtk.Window):
         selected_browser = widget.get_active_text()  
         if selected_browser == "Firefox 全版本":
             browser = 'firefox'
-        elif selected_browser == "Chrome/Chromium/Edge":
+        elif selected_browser == "Chrome/Edge":
             browser = 'www'
+        elif selected_browser == "Chromium":
+            browser = 'chromium'
         else:
             browser = 'unknown'
         config.set('Config', 'browser', browser)
@@ -137,14 +139,23 @@ def load_config(config_path):
     global terminal
     global browser
     global appPath
-    config.read(config_path)
-    terminal = config.get('Config', 'terminal')
-    browser = config.get('Config', 'browser')
-    appPath = config.get('Config', 'appPath')
-    return config
+    try:
+        with open(config_path, 'r', encoding='utf-8') as f:
+            f.close()
+        config.read(config_path)
+        terminal = config.get('Config', 'terminal')
+        browser = config.get('Config', 'browser')
+        appPath = config.get('Config', 'appPath')
+        return config
+    except FileNotFoundError as e:
+        print("Error: 未初始化配置! 无法获取配置信息!")
+        return None
+        
 
 def main(setup_path):
     return_conf = load_config(setup_path)
+    if return_conf == None:
+        return 127
     win = Preference()  
     win.connect("destroy", Gtk.main_quit)  # 当窗口关闭时退出主循环  
     Gtk.main()

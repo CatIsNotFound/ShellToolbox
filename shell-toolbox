@@ -1,10 +1,9 @@
 #!/usr/bin/python3
 import os
 from sys import argv
-from funcs import main, preference
+from funcs import main, preference, update, update_gui
 if __name__ == '__main__':
-    VERSION = '0.1.3'
-    VERSION_TYPE = 'Beta'
+    TAG_NAME = 'v0.1.4_beta'
     #os.chdir("/opt/ShellToolbox")
     if len(argv) != 1:
         if argv[1] == '--clear':
@@ -18,6 +17,7 @@ if __name__ == '__main__':
             print(f"--preference\t显示【首选项】页面")
             print(f"--repair\t解决脚本目录下权限不足的问题")
             print(f"--reset\t\t恢复默认首选项配置【推荐】")
+            print(f"--update\t检查软件更新")
             print(f"--version\t显示当前版本号")
         elif argv[1] == '--preference':
             preference.main("./config/setup.ini")
@@ -28,14 +28,18 @@ if __name__ == '__main__':
             os.system("rm -rf ./config/setup.ini")
             main.options()
             print("Successful!")
+        elif argv[1] == '--update':
+            update.main(TAG_NAME)
+            # update_gui.show_gui(TAG_NAME)
         elif argv[1] == '--version':
-            print(f"Shell Toolbox v{VERSION}-{VERSION_TYPE}")
+            print(f"Shell Toolbox {TAG_NAME}")
             print(f"作者: CatIsNotFound")
-            print(f"获取更新? 请访问: https://github.com/CatIsNotFound/ShellToolbox/releases")
+            print(f"获取更新? 请执行: {argv[0]} --update")
+            # print(f"获取更新? 请访问: https://github.com/CatIsNotFound/ShellToolbox/releases")
         else:
             print(f"未知的选项: {argv[1]}")
             print(f"尝试执行: {argv[0]} --help 查看所有用法.")
         # pass
     else:
-        main.start(VERSION, VERSION_TYPE)
+        main.start(TAG_NAME)
         

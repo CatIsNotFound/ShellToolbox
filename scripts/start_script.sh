@@ -5,13 +5,13 @@ case $1 in
         gnome-terminal -- $2 $3 $4 $5 $6 $7 $8 $9
         ;;
     plasma)
-        konsole -e "bash" $2 $3 $4 $5 $6 $7 $8 $9
+        konsole -e $2 $3 $4 $5 $6 $7 $8 $9
         ;;
     xfce4)
-        xfce4-terminal -e "bash $2 $3 $4 $5 $6 $7 $8 $9"
+        xfce4-terminal -e $2 $3 $4 $5 $6 $7 $8 $9
         ;;
     qt)
-        qterminal -e 'bash' $2 $3 $4 $5 $6 $7 $8 $9
+        qterminal -e $2 $3 $4 $5 $6 $7 $8 $9
         ;;
     *)
         # echo "错误：找不到终端以执行！"

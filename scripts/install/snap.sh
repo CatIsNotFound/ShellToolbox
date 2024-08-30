@@ -1,4 +1,15 @@
 #!/bin/bash
+function stop_snap() {
+    echo -e "\033[1m即将关闭所有 Snap 软件...\033[0m"
+    read -p '请按任意键执行或按下 Ctrl+C 取消执行...' opt
+    echo "正在关闭所有 Snap 软件..."
+    echo "$(ps -ef | grep /snap | grep $(whoami) | grep -v grep | awk '{print $2}')" > .snap_pids
+    sleep 1s
+    pkill --pidfile .snap_pids
+    sleep 1s
+    rm -rf .snap_pids
+}
+
 function remove_snap() {
     echo -e "\033[1;31m注意: 执行此操作前，请输入用户密码以确认执行操作!\033[0m"
     sudo echo -e "\033[1m正在一键移除 Snap...\033[0m"
@@ -10,9 +21,9 @@ function remove_snap() {
         sleep 3s
         exit 0
     fi
-    echo -e "\033[1;33m警告: 为确保 Snap 能完全移除，请先关闭 Firefox、Ubuntu Store 等 Snap 应用。\033[0m"
-    read -p '若已全部关闭所有 Snap 应用，请按任意键以执行移除操作...' opt 
-    echo "(1) 正在移除所有 Snap 软件..."
+    echo -e "\033[1;33m警告: 为确保 Snap 能完全移除，Snap 下的所有应用都将被关闭。\033[0m"
+    stop_snap
+    echo "(1/2) 正在移除所有 Snap 软件..."
     if [ -d .cache_snap ];then
         rm -rf .cache_snap
     fi
@@ -29,7 +40,7 @@ function remove_snap() {
     done
     cd ..
     rm -rf .cache_snap
-    echo "(2) 正在移除 Snap..."
+    echo "(2/2) 正在移除 Snap..."
     sudo apt-get purge snapd -y
     if [ $? -ne 0 ];then
         echo "正在重试..."
@@ -82,18 +93,25 @@ function install_snap() {
     exit 0
 }
 
-
-echo "你需要对 Snap 作出什么操作？"
-echo "输入数字以确认"
-select option in 安装 移除; do
-    case $option in
-        安装)
-            # echo "安装"
-            install_snap
-            ;;
-        移除)
-            # echo "移除"
-            remove_snap
-            ;;
-    esac
-done
+if [ -f /usr/bin/snap ];then
+    echo "你需要对 Snap 作出什么操作？"
+    echo "输入数字以确认"
+    select option in 停止 移除; do
+        case $option in
+            停止)
+                stop_snap
+                ;;
+            移除)
+                # echo "移除"
+                remove_snap
+                ;;
+        esac
+    done
+else
+    echo "当前系统未安装 Snap，是否确认安装? 按 Y 或 y 确认下载安装. "
+    read -p "安装? (y)" opt
+    if [[ $opt == 'y' || $opt == 'Y' ]];then
+        install_snap
+    fi
+fi
+    

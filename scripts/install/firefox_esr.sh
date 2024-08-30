@@ -14,6 +14,7 @@ if [ -f /usr/bin/snap ];then
         read -p "检查到你已安装 Firefox Snap 版本，确认将其移除? (Y/N)" opt
         if [[ $opt == 'y' || $opt == 'Y' ]];then
             echo "正在移除 Firefox, 这需要一点时间..."
+            sudo killall firefox
             sudo snap remove firefox > /dev/null
         else
             echo "正在取消安装 Firefox ESR..."
@@ -35,6 +36,7 @@ if [ $(apt list firefox --installed 2> /dev/null | wc -l) -gt 1 ];then
     read -p "是否确认移除 Firefox 并安装 Firefox ESR 版本? (y/n) " opt
     if [[ $opt == 'y' || $opt == 'Y' ]];then
         echo "正在移除 Firefox..."
+        sudo killall firefox
         sudo apt-get purge firefox -y
     else
         exit 0
@@ -45,6 +47,7 @@ if [ $(apt list firefox-esr* --installed 2> /dev/null | wc -l) -ge 2 ];then
     read -p "输入 [remove] 以确认卸载, 或按任意键以检查更新. (remove) " opt
     if [[ $opt == 'remove' ]];then
         echo "正在移除 Firefox ESR..."
+        sudo killall firefox-esr
         sudo apt-get purge firefox-esr -y &> /dev/null
         echo "已移除 Firefox ESR, 即将结束执行..."
         sleep 3s

@@ -3,8 +3,7 @@ import gi
 gi.require_version('Gtk', '3.0')  
 from gi.repository import Gtk 
 import sys, subprocess, os, configparser
-from funcs import preference
-
+from funcs import preference, update_gui
 
 class AppWindow(Gtk.ApplicationWindow):  
     def __init__(self, *args, **kwargs):  
@@ -111,8 +110,11 @@ class AppWindow(Gtk.ApplicationWindow):
         quit()
     
     def on_open_preference(self, widget):
-        preference.main(f'{appPath}/config/setup.ini')
-        options()
+        return_code = preference.main(f'{appPath}/config/setup.ini')
+        if return_code == 127:
+            self.show_error_dialog("Error: 未初始化配置, 无法获取配置信息! 请重新启动此软件! ")
+        else:
+            options()
 
     def on_button_clicked(self, widget, button_text):  
         print(f"正在执行：{button_text}") 
@@ -120,26 +122,28 @@ class AppWindow(Gtk.ApplicationWindow):
     def on_open_web(self, widget, url):
         n = self.show_question_dialog("即将使用浏览器访问外部网页，是否前往? ")
         if n == 1:
-            # try:
-                if browser == 'firefox':
-                    return_code = run_outside_command(f"/*/bin/firefox* {url}", True)
-                elif browser == 'www':
-                    return_code = run_outside_command(f"gnome-www-browser -- {url}")
-                else:
-                    self.show_error_dialog("无法打开浏览器，请尝试修改 [首选项] >> [浏览方式]")
-            # except Exception as e:
-                if return_code:
-                    self.show_error_dialog(f"打开浏览器时出现错误，报错如下：\n{return_code}")
+            if browser == 'firefox':
+                self.run_command(self, f"/*/bin/firefox* {url}")
+            elif browser == 'www':
+                self.run_command(self, f"gnome-www-browser {url}")
+            elif browser == 'chromium':
+                self.run_command(self, f"chromium {url}")
+            else:
+                self.show_error_dialog("无法打开浏览器，请尝试修改 [首选项] >> [浏览方式]")
+            # if return_code == 127:
+            #     self.show_error_dialog("无法打开浏览器，请尝试修改 [首选项] >> [浏览方式]")
 
     def get_version(self, widget):
-        self.show_info_dialog(f"版本号: {app_version}_{version_type}\n作者: CatIsNotFound\n使用 Bash Shell 编写脚本\n使用 GTK 3+ 编写 UI")
+        self.show_info_dialog(f"版本号: {version_name}\n作者: CatIsNotFound\n使用 Bash Shell 编写脚本\n使用 GTK 3+ 编写 UI")
     
     def get_newer_version(self, widget):
-        self.show_info_dialog("此版本下暂不支持检查更新, 请前往 Github Release 页面下载.")
-        self.on_open_web(self.on_open_web, "https://github.com/CatIsNotFound/ShellToolbox/releases")
+        # self.show_info_dialog("此版本下暂不支持检查更新, 请前往 Github Release 页面下载.")
+        # self.on_open_web(self.on_open_web, "https://github.com/CatIsNotFound/ShellToolbox/releases")
+        
+        update_gui.show_gui(version_name)
 
 
-    # 执行程序
+    # 打开终端以执行程序
     def run_command(self, widget, command):
         err = self.open_terminal(terminal, command)
         if err == 128:
@@ -262,19 +266,19 @@ def get_output(command, outputmode="stdout"):
 
 def run_outside_command(command, isShell=False):
     process = subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=isShell)
+    print(f"Running: {command.split(' ')}")
+    stderr = process.stderr.readline().decode('utf-8')
     try:
         process.wait(3)
     except subprocess.TimeoutExpired as e:
         pass
-
-    # err = process.stderr.readline().decode('utf-8')
     return process.returncode
+    # err = process.stderr.readline().decode('utf-8')
+    # return process.returncode
 
-def start(version, ver_type):
-    global app_version
-    global version_type
-    app_version = version
-    version_type = ver_type
+def start(tag_name):
+    global version_name
+    version_name = tag_name
     options()
     app = Application()  
     exit_status = app.run(sys.argv)  
