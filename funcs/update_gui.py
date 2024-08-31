@@ -7,7 +7,7 @@ from funcs import update
 
 class Update(Gtk.Window):
     def __init__(self):
-        super().__init__(title="更新软件")
+        super().__init__(title="已发现最新版本")
         
         self.set_default_size(600, 400)
         self.set_resizable(False)
@@ -15,7 +15,7 @@ class Update(Gtk.Window):
         self.spinner = Gtk.Spinner()
         self.spinner.start()
         
-        self.label = Gtk.Label(label="最新版本")
+        self.label = Gtk.Label()
 
         self.scrolledwindow = Gtk.ScrolledWindow()
         self.scrolledwindow.set_hexpand(True)
@@ -23,22 +23,16 @@ class Update(Gtk.Window):
         self.textview = Gtk.TextView()
         self.textview.set_editable(False)
         self.textbuffer = self.textview.get_buffer()
-        self.textbuffer.set_text(f"asdasd\nasdasdasd")
-        self.textbuffer.set_text(
-            "This is some text inside of a Gtk.TextView. "
-            + "Select text and click one of the buttons 'bold', 'italic', "
-            + "or 'underline' to modify the text accordingly."
-        )
         self.scrolledwindow.add(self.textview)
 
-        self.btn_yes = Gtk.Button(label="下载更新")
-        self.btn_yes.connect("clicked", self.on_btn_update)  
-        self.btn_no = Gtk.Button(label="取消更新")
+        self.btn_yes = Gtk.Button(label="立刻下载更新")
+        self.btn_yes.connect("clicked", self.on_btn_update, pack_ver)  
+        self.btn_no = Gtk.Button(label="取消本次更新")
         self.btn_no.connect("clicked", self.on_btn_cancel)
 
         self.vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)  
         self.hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
-        self.hbox.pack_end(self.btn_yes, False, False, 20)
+        self.hbox.pack_end(self.btn_yes, False, False, 10)
         self.hbox.pack_end(self.btn_no, False, False, 5)
 
         self.vbox.pack_start(self.label, False, False, 5)
@@ -55,33 +49,34 @@ class Update(Gtk.Window):
         self.textbuffer.set_text(packs['body'])
         if update.is_newer_version(packs["tag_name"], version):
             self.show_all()
-        #     opt = self.show_question_dialog(f"已找到最新版本({packs['tag_name']})，是否选择更新软件包？")
-        #     if opt == 1:
-        #         # get_pack_url(packs)
-        #         # self.label.text("正在下载更新...")
-        #         pack_url = update.get_pack_url(packs, 0)
-        #         return_code = update.download_file(pack_url, pack_url.split("/")[-1])
-        #         if return_code == 0:
-        #             self.show_info_dialog("已下载完成，请重新启动软件!")
-        #         else:
-        #             self.show_error_dialog("下载软件包时出现错误! 请重试!")
-        #         self.destroy()
-            return None
         else:
             self.show_info_dialog("软件已是最新版本, 无需更新!")
             self.destroy()
             
 
-    def on_btn_update(self, widget):
-        if widget.get_label() != "正在更新":
-            widget.set_label("正在更新")
-            pack_url = update.get_pack_url(packs, 0)
+    def on_btn_update(self, widget, pack_ver):
+        import os
+        if pack_ver == 'zip':
+            mode = 0
+        elif pack_ver == 'deb':
+            mode = 1
+        pack_url = update.get_pack_url(packs, mode)
+        n = self.show_question_dialog("在更新前，请先关闭所有正在执行的脚本再确认更新!")
+        if n == 1:
+            os.chdir("..")
             return_code = update.download_file(pack_url, pack_url.split("/")[-1])
             if return_code == 0:
-                self.show_info_dialog("已下载完成，请重新启动软件!")
-                quit()
+                err_code = update.install_pack(pack_url.split("/")[-1])
+                if err_code == 0:
+                    self.show_info_dialog("安装完成，请重新启动软件!")
+                    quit()
+                else:
+                    self.show_error_dialog("Error: 安装时遇到错误, 请重试!")
+                    os.chdir("./ShellToolbox")
+                    self.destroy()
             else:
-                self.show_error_dialog("下载软件包时出现错误! 请检查网络或更换网络环境!")
+                self.show_error_dialog(f"Error: 下载软件包时出现错误! 请检查网络或更换网络环境!\n{return_code}")
+                os.chdir("./ShellToolbox")
                 self.destroy()
         pass
 
@@ -123,10 +118,11 @@ class Update(Gtk.Window):
         info_dialog.run()  
         info_dialog.destroy()
 
-def show_gui(version):
+def show_gui(version, pack_version):
     global tag_ver
-    global win    
+    global pack_ver
     tag_ver = version
+    pack_ver = pack_version
     win = Update()
     win.connect("destroy", Gtk.main_quit)
     Gtk.main()

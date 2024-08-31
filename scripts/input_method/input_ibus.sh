@@ -159,8 +159,8 @@ check_fcitx() {
     fi
     if [ $T ];then
         echo "检查到当前系统下已安装 $T, 是否确认移除并安装 ibus? "
-        echo -e "\033[1m注意：ibus 不能与 fcitx 一同安装! \033[0m"
-        read -p "是否移除 fcitx? (yes) " OPT
+        echo -e "\033[1m注意：ibus 不能与 $T 一同安装! \033[0m"
+        read -p "是否移除 $T? (yes) " OPT
         if [[ $OPT == 'yes' ]];then
             echo -e "\033[1m正在准备移除...\033[0m"
             echo -e "\033[1;31m注意: 请输入用户密码以确认执行操作!\033[0m"

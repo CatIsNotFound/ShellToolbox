@@ -9,7 +9,7 @@ echo -e "3) 已通知正在使用此账户的用户以做好保存或备份\033[
 echo -e "\033[1;31m注意: 此脚本执行后可能会影响到所有登录于同一账户的用户, 请谨慎使用! \033[0m\n"
 
 echo "请仔细阅读以上警告."
-sleep 3s
+sleep 5s
 
 
 LOGIN_USER_NUM=`who | cut -d ' ' -f1 | uniq | wc -l`
@@ -34,3 +34,4 @@ else
         exit 0
     fi
 fi
+

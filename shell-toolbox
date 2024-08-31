@@ -4,7 +4,9 @@ from sys import argv
 from funcs import main, preference, update, update_gui
 if __name__ == '__main__':
     TAG_NAME = 'v0.1.4_beta'
-    #os.chdir("/opt/ShellToolbox")
+    PACK_VER = 'zip'
+    if PACK_VER == 'deb':
+        os.chdir("/opt/ShellToolbox")
     if len(argv) != 1:
         if argv[1] == '--clear':
             os.system("rm -rf ./config/setup.ini")
@@ -29,8 +31,8 @@ if __name__ == '__main__':
             main.options()
             print("Successful!")
         elif argv[1] == '--update':
-            update.main(TAG_NAME)
-            # update_gui.show_gui(TAG_NAME)
+            # update.main(TAG_NAME)
+            update_gui.show_gui(TAG_NAME, PACK_VER)
         elif argv[1] == '--version':
             print(f"Shell Toolbox {TAG_NAME}")
             print(f"作者: CatIsNotFound")

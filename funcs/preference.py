@@ -66,7 +66,7 @@ class Preference(Gtk.Window):
         # self.vbox.pack_start(self.terminal_combo, False, False, 0)
 
         self.hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        self.hbox.pack_end(self.button_save_settings, False, False, 5)
+        self.hbox.pack_end(self.button_save_settings, False, False, 8)
         self.hbox.pack_end(self.button_cancel, False, False, 5)
         # self.hbox1 = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
         # self.hbox1.pack_start(self.label_software_location, False, False, 10)
