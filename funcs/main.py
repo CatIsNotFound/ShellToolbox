@@ -59,7 +59,7 @@ class AppWindow(Gtk.ApplicationWindow):
         github_item.connect("activate", self.on_open_web, "https://github.com/CatIsNotFound/ShellToolbox")
         help_menu_dropdown.append(github_item)
         checkUpdate_item = Gtk.MenuItem(label="检查更新")
-        checkUpdate_item.connect("activate", self.get_newer_version, pack_ver)
+        checkUpdate_item.connect("activate", self.get_newer_version)
         help_menu_dropdown.append(checkUpdate_item)
         version_item = Gtk.MenuItem(label="查看当前版本号")
         version_item.connect("activate", self.get_version)
@@ -102,7 +102,6 @@ class AppWindow(Gtk.ApplicationWindow):
                 self.show_warning_dialog("警告: 你正在以管理员身份（或 root 身份）运行工具箱, 请以普通用户下运行此工具！")
                 quit()
                 
-            
         except Exception as e:
             self.show_error_dialog(f"Error: 找不到菜单或读取菜单时出现错误! 报错如下: \n{e}")
             quit()
@@ -137,8 +136,8 @@ class AppWindow(Gtk.ApplicationWindow):
     def get_version(self, widget):
         self.show_info_dialog(f"版本号: {version_name}\n作者: CatIsNotFound\n使用 Bash Shell 编写脚本\n使用 GTK 3+ 编写 UI")
     
-    def get_newer_version(self, widget, pack_version):        
-        update_gui.show_gui(version_name, pack_version)
+    def get_newer_version(self, widget):        
+        update_gui.show_gui(version_name)
 
 
     # 打开终端以执行程序
@@ -268,11 +267,9 @@ def run_outside_command(command, isShell=False):
     process.wait()
     return process.returncode
 
-def start(tag_name, pack_version):
+def start(tag_name):
     global version_name
-    global pack_ver
     version_name = tag_name
-    pack_ver = pack_version
     options()
     app = Application()  
     exit_status = app.run(sys.argv)  

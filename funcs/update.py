@@ -17,28 +17,22 @@ def check_update():
         return 103
 
 # 获取软件包下载路径
-def get_pack_url(pack_json, mode:int=0):
+def get_pack_url(pack_json):
     pack_count = len(pack_json['assets'])
-    return pack_json['assets'][mode]['browser_download_url']
+    return pack_json['assets'][0]['browser_download_url']
 
 # 安装或解压软件包
 def install_pack(pack:str):
-    print("开始安装/解压...")
+    # print("开始安装/解压...")
     if pack.endswith(".zip"):
-        command = f"unzip {pack}"
-        pass
-    elif pack.endswith(".deb"):
-        command = f"pkexec dpkg -i {pack}"
-        pass
-    # process = subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    # err = process.stderr.readline().decode('utf-8')
-    # if 
+        print("OK~")
+        command = f"unzip -o {pack}"
     from funcs.main import get_output
-    return get_output(command, "return")
+    return get_output(command, "stderr")
 
 # 下载软件包
 def download_file(url, destination): 
-    print(f"正在从 {url} 获取 {destination}...")
+    # print(f"正在从 {url} 获取 {destination}...")
     try:
         response = requests.get(url,  stream=True) 
         if response.status_code  == 200: 

@@ -15,11 +15,11 @@
 
 ```shell
 sudo dpkg -i ./ShellToolbox*.deb
-shtools
+shell-toolbox 
 ```
 
-若无法打开，请执行: `shtools --reset` 以重新生成配置文件
-若出现无法打开且无法执行脚本的情况, 请尝试执行: `shtools --repair`.
+若无法打开，请执行: `shell-toolbox --reset` 以重新生成配置文件
+若出现无法打开且无法执行脚本的情况, 请尝试执行: `shell-toolbox --repair`.
 
 ### Zip 包
 在当前下载目录下打开终端，并执行如下命令:
@@ -27,12 +27,12 @@ shtools
 ```shell
 unzip ShellToolbox*.zip
 cd ShellToolbox
-./shtools 
+./shell-toolbox  
 ```
 
-若无法打开软件, 请执行: `./shtools --reset` 以重新生成配置文件.
+若无法打开软件, 请执行: `./shell-toolbox --reset` 以重新生成配置文件.
 
-若出现无法打开且无法执行脚本的情况, 请尝试执行: `./shtools --repair`.
+若出现无法打开且无法执行脚本的情况, 请尝试执行: `./shell-toolbox --repair`.
 
 ## 参阅信息
 

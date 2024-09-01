@@ -1,4 +1,5 @@
 import gi
+import os
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
@@ -16,6 +17,8 @@ class Update(Gtk.Window):
         self.spinner.start()
         
         self.label = Gtk.Label()
+        self.tips = Gtk.Label()
+        self.tips.set_markup("<b>注意: 下载安装更新时，出现未响应等情况属于正常现象，请勿直接强制退出! </b>")
 
         self.scrolledwindow = Gtk.ScrolledWindow()
         self.scrolledwindow.set_hexpand(True)
@@ -37,6 +40,7 @@ class Update(Gtk.Window):
 
         self.vbox.pack_start(self.label, False, False, 5)
         self.vbox.pack_start(self.scrolledwindow, True, True, 5)
+        self.vbox.pack_start(self.tips, False, False, 5)
         self.vbox.pack_end(self.hbox, False, False, 10)
 
         self.add(self.vbox)
@@ -54,24 +58,19 @@ class Update(Gtk.Window):
             self.destroy()
             
 
-    def on_btn_update(self, widget, pack_ver):
-        import os
-        if pack_ver == 'zip':
-            mode = 0
-        elif pack_ver == 'deb':
-            mode = 1
-        pack_url = update.get_pack_url(packs, mode)
+    def on_btn_update(self, widget):
+        pack_url = update.get_pack_url(packs)
         n = self.show_question_dialog("在更新前，请先关闭所有正在执行的脚本再确认更新!")
         if n == 1:
             os.chdir("..")
             return_code = update.download_file(pack_url, pack_url.split("/")[-1])
             if return_code == 0:
                 err_code = update.install_pack(pack_url.split("/")[-1])
-                if err_code == 0:
-                    self.show_info_dialog("安装完成，请重新启动软件!")
+                if err_code == "":
+                    self.show_info_dialog("下载完成，请重新启动软件! ")
                     quit()
                 else:
-                    self.show_error_dialog("Error: 安装时遇到错误, 请重试!")
+                    self.show_error_dialog(f"Error: 安装时遇到错误, 请重试!\n{err_code}")
                     os.chdir("./ShellToolbox")
                     self.destroy()
             else:
@@ -118,11 +117,9 @@ class Update(Gtk.Window):
         info_dialog.run()  
         info_dialog.destroy()
 
-def show_gui(version, pack_version):
+def show_gui(version):
     global tag_ver
-    global pack_ver
     tag_ver = version
-    pack_ver = pack_version
     win = Update()
     win.connect("destroy", Gtk.main_quit)
     Gtk.main()
