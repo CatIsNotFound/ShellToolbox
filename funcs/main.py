@@ -112,7 +112,7 @@ class AppWindow(Gtk.ApplicationWindow):
     def on_open_preference(self, widget):
         return_code = preference.main(f'{appPath}/config/setup.ini')
         if return_code == 127:
-            self.show_error_dialog("Error: 未初始化配置, 无法获取配置信息! 请重新启动此软件! ")
+            self.show_error_dialog("Error: 未初始化配置, 无法获取配置信息! \n请重新启动此软件! ")
         else:
             options()
 
