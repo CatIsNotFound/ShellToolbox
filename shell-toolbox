@@ -32,7 +32,7 @@ if __name__ == '__main__':
             print("Successful!")
         elif argv[1] == '--update':
             # update.main(TAG_NAME)
-            update_gui.show_gui(TAG_NAME, PACK_VER)
+            update_gui.show_gui(TAG_NAME)
         elif argv[1] == '--version':
             print(f"Shell Toolbox {TAG_NAME}")
             print(f"作者: CatIsNotFound")

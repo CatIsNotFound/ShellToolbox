@@ -29,7 +29,7 @@ class Update(Gtk.Window):
         self.scrolledwindow.add(self.textview)
 
         self.btn_yes = Gtk.Button(label="立刻下载更新")
-        self.btn_yes.connect("clicked", self.on_btn_update, pack_ver)  
+        self.btn_yes.connect("clicked", self.on_btn_update)  
         self.btn_no = Gtk.Button(label="取消本次更新")
         self.btn_no.connect("clicked", self.on_btn_cancel)
 
