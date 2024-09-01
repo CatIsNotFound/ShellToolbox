@@ -3,7 +3,7 @@ import os
 from sys import argv
 from funcs import main, preference, update, update_gui
 if __name__ == '__main__':
-    TAG_NAME = 'v0.1.4_beta'
+    TAG_NAME = 'v0.1.3_beta'
     PACK_VER = 'zip'
     if PACK_VER == 'deb':
         os.chdir("/opt/ShellToolbox")

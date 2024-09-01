@@ -19,13 +19,15 @@ def check_update():
 # 获取软件包下载路径
 def get_pack_url(pack_json):
     pack_count = len(pack_json['assets'])
-    return pack_json['assets'][0]['browser_download_url']
+    for i in range(0, pack_count):
+        if pack_json['assets'][i]['browser_download_url'].endswith('.zip'):
+            return pack_json['assets'][i]['browser_download_url']
 
 # 安装或解压软件包
 def install_pack(pack:str):
     # print("开始安装/解压...")
     if pack.endswith(".zip"):
-        print("OK~")
+        # print("OK~")
         command = f"unzip -o {pack}"
     from funcs.main import get_output
     return get_output(command, "stderr")
@@ -76,3 +78,9 @@ def main(tag_name):
 
         else:
             print("软件已是最新版本！")
+
+if __name__ == '__main__':
+    json = check_update()
+    with open(".update_info.json", 'w', encoding='utf-8') as file:
+        file.write(json)
+        file.close()
