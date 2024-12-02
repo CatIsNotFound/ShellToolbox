@@ -11,6 +11,9 @@ class AppWindow(Gtk.ApplicationWindow):
         self.set_title("Shell Toolbox")  
         # self.set_default_size(600, 180)
         self.set_resizable(False)  
+
+        # 添加 "关闭" 按钮事件
+        self.connect("delete-event", self.on_quit_btn)
         
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)  
         self.add(box)
@@ -109,6 +112,9 @@ class AppWindow(Gtk.ApplicationWindow):
     def on_quit(self, widget):  
         quit()
     
+    def on_quit_btn(self, widget, *args):
+        quit()
+    
     def on_open_preference(self, widget):
         return_code = preference.main(f'{appPath}/config/setup.ini')
         if return_code == 127:
@@ -137,35 +143,40 @@ class AppWindow(Gtk.ApplicationWindow):
         self.show_info_dialog(f"版本号: {version_name}\n作者: CatIsNotFound\n使用 Bash Shell 编写脚本\n使用 GTK 3+ 编写 UI")
     
     def get_newer_version(self, widget):        
-        update_gui.show_gui(version_name)
-
+        update_gui.show_gui(version_name, pack_version)
 
     # 打开终端以执行程序
     def run_command(self, widget, command):
         err = self.open_terminal(terminal, command)
-        if err == 128:
+        if err == "128":
             self.show_error_dialog(button_text="错误：找不到打开的终端或当前系统没有安装此终端！")
     
     # 执行外部程序
     def run_subProcess(self, widget, command, window_type='', text=""):
         if window_type == 'warn':
             self.show_warning_dialog(text)
-        err = get_output(command, "stderr")
-        if err != "":
-            self.show_error_dialog(f"执行时发生错误, 输出内容如下: \n{err}")
+        # err = run_outside_command(command, True)
+        output = get_output(command, 'stderr')
+        if output != "":
+            self.show_error_dialog(f"Error: 执行时产生错误! \n错误内容: {output}")
 
     # 打开后台终端并执行脚本
     def open_terminal(self, terminal, operation):
         command = f'{appPath}/scripts/start_script.sh {terminal} {operation}'
         # print(f'正在执行：{command}')
-        process = subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        stderr = process.stderr.readline().decode()
-        stdout = process.stdout.readline().decode()
-        process.wait()
-        if stdout == "128":
-            self.show_error_dialog(f"Error: 执行时产生错误! (code: 128) \n错误内容如下: \n{stderr}")
-        elif stdout == "127":
-            self.show_error_dialog("Error: 未知的终端! 请选择其它终端! (code: 127)")
+        # process = subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # stderr = process.stderr.readline().decode()
+        # stdout = process.stdout.readline().decode()
+        # process.wait()
+        err = get_output(command, "stdout")
+        # print(f"Runned: {err}")
+        if err == "128":
+            self.show_error_dialog(f"Error: 无法打开外部终端，无法运行脚本! (code: 128)")
+        if err == "127":
+            self.show_error_dialog(f"Error: 找不到打开的终端或当前系统没有安装此终端！ (code: 127)")
+        # if err != 0:
+        #     self.show_error_dialog(f"Error: 执行时出错！\n错误内容: {err}")
+        return err
     
     # 显示问题对话框
     def show_question_dialog(self, button_text):
@@ -249,10 +260,13 @@ def options():
         file.close()
 
 def get_output(command, outputmode="stdout"):
-    process = subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stderr = process.stderr.readline().decode('utf-8')
-    stdout = process.stdout.readline().decode('utf-8')
-    process.wait()
+    try:
+        process = subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stderr = process.stderr.readline().decode('utf-8')
+        stdout = process.stdout.readline().decode('utf-8')
+        process.wait()
+    except FileNotFoundError:
+        return "找不到可执行脚本或命令！"
     if outputmode == 'stdout':
         return stdout.strip()
     elif outputmode == 'stderr':
@@ -262,14 +276,22 @@ def get_output(command, outputmode="stdout"):
 
 
 def run_outside_command(command, isShell=False):
-    process = subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=isShell)
-    # err = process.stderr.readline().decode('utf-8')
-    process.wait()
-    return process.returncode
+    try:
+        process = subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=isShell)
+        # err = process.stderr.readline().decode('utf-8')
+        process.wait()
+        # 返回一个程序执行错误时的返回码
+        return process.returncode()
+    except FileNotFoundError:
+        return 127
+    # except TypeError:
+    #     return 64
 
-def start(tag_name):
+def start(tag_name, pack_ver):
     global version_name
+    global pack_version
     version_name = tag_name
+    pack_version = pack_ver
     options()
     app = Application()  
     exit_status = app.run(sys.argv)  

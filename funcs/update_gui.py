@@ -1,9 +1,10 @@
 import gi
-import os
+import os, threading
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 from funcs import update
+from funcs import main
 
 
 class Update(Gtk.Window):
@@ -18,7 +19,7 @@ class Update(Gtk.Window):
         
         self.label = Gtk.Label()
         self.tips = Gtk.Label()
-        self.tips.set_markup("<b>注意: 下载安装更新时，出现未响应等情况属于正常现象，请勿直接强制退出! </b>")
+        # self.tips.set_markup("<b>注意: 下载安装更新时，出现未响应等情况属于正常现象，请勿直接强制退出! </b>")
 
         self.scrolledwindow = Gtk.ScrolledWindow()
         self.scrolledwindow.set_hexpand(True)
@@ -28,7 +29,7 @@ class Update(Gtk.Window):
         self.textbuffer = self.textview.get_buffer()
         self.scrolledwindow.add(self.textview)
 
-        self.btn_yes = Gtk.Button(label="立刻下载更新")
+        self.btn_yes = Gtk.Button(label="前往下载页面")
         self.btn_yes.connect("clicked", self.on_btn_update)  
         self.btn_no = Gtk.Button(label="取消本次更新")
         self.btn_no.connect("clicked", self.on_btn_cancel)
@@ -54,33 +55,19 @@ class Update(Gtk.Window):
         if update.is_newer_version(packs["tag_name"], version):
             self.show_all()
         else:
+            self.show_all()
             self.show_info_dialog("软件已是最新版本, 无需更新!")
             self.destroy()
-            
 
-    def on_btn_update(self, widget):
-        pack_url = update.get_pack_url(packs)
-        n = self.show_question_dialog("在更新前，请先关闭所有正在执行的脚本再确认更新!")
-        if n == 1:
-            os.chdir("..")
-            return_code = update.download_file(pack_url, pack_url.split("/")[-1])
-            if return_code == 0:
-                err_code = update.install_pack(pack_url.split("/")[-1])
-                if err_code == "":
-                    self.show_info_dialog("下载完成，请重新启动软件! ")
-                    quit()
-                else:
-                    self.show_error_dialog(f"Error: 安装时遇到错误, 请重试!\n{err_code}")
-                    os.chdir("./ShellToolbox")
-                    self.destroy()
-            else:
-                self.show_error_dialog(f"Error: 下载软件包时出现错误! 请检查网络或更换网络环境!\n{return_code}")
-                os.chdir("./ShellToolbox")
-                self.destroy()
-        pass
+    def on_btn_update(self, widget): 
+        # main.open_web("https://www.github.com/CatIsNotFound/ShellToolbox/releases")
+        main_window = main.AppWindow()
+        main_window.on_open_web(main_window, "https://www.github.com/CatIsNotFound/ShellToolbox/releases")
+        
 
     def on_btn_cancel(self, widget):
         self.destroy()
+    
     
     # 显示问题对话框
     def show_question_dialog(self, button_text):
@@ -117,9 +104,11 @@ class Update(Gtk.Window):
         info_dialog.run()  
         info_dialog.destroy()
 
-def show_gui(version):
+def show_gui(version, ver_type):
     global tag_ver
+    global version_type
     tag_ver = version
+    version_type = ver_type
     win = Update()
     win.connect("destroy", Gtk.main_quit)
     Gtk.main()

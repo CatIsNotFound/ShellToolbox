@@ -10,6 +10,9 @@ case $1 in
     xfce4)
         xfce4-terminal -e $2 $3 $4 $5 $6 $7 $8 $9
         ;;
+    cosmic)
+        cosmic-term -- $2 $3 $4 $5 $6 $7 $8 $9
+        ;;
     qt)
         qterminal -e $2 $3 $4 $5 $6 $7 $8 $9
         ;;

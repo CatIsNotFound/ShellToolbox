@@ -18,7 +18,7 @@ class Preference(Gtk.Window):
         # 创建“选择终端”按钮  
         self.label_select_terminal = Gtk.Label(label="选择终端")  
         self.terminal_combo = Gtk.ComboBoxText()  
-        terminals = ["Gnome Terminal", "Konsole", "Xfce4 Terminal", "QTerminal", "Other"]  
+        terminals = ["Gnome Terminal", "Konsole", "Xfce4 Terminal", "Cosmic", "QTerminal", "Other"]  
         for t_name in terminals:  
             self.terminal_combo.append_text(f"{t_name}")
         if terminal == 'gnome': 
@@ -27,10 +27,12 @@ class Preference(Gtk.Window):
             n = 1
         elif terminal == 'xfce4': 
             n = 2
-        elif terminal == 'qt': 
+        elif terminal == 'cosmic':
             n = 3
-        else: 
+        elif terminal == 'qt': 
             n = 4
+        else: 
+            n = 5
         self.terminal_combo.set_active(n)  # 设置默认选项  
         self.terminal_combo.connect("changed", self.on_terminal_combo_changed) 
 
@@ -102,6 +104,8 @@ class Preference(Gtk.Window):
             terminal = 'plasma'
         elif selected_terminal == "Xfce4 Terminal":
             terminal = 'xfce4'
+        elif selected_terminal == "Cosmic":
+            terminal = 'cosmic'
         elif selected_terminal == "QTerminal":
             terminal = 'qt'
         else:

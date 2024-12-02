@@ -17,10 +17,10 @@ def check_update():
         return 103
 
 # 获取软件包下载路径
-def get_pack_url(pack_json):
+def get_pack_url(pack_json, version_type):
     pack_count = len(pack_json['assets'])
     for i in range(0, pack_count):
-        if pack_json['assets'][i]['browser_download_url'].endswith('.zip'):
+        if pack_json['assets'][i]['browser_download_url'].endswith(f'.{version_type}'):
             return pack_json['assets'][i]['browser_download_url']
 
 # 安装或解压软件包
@@ -29,25 +29,29 @@ def install_pack(pack:str):
     if pack.endswith(".zip"):
         # print("OK~")
         command = f"unzip -o {pack}"
+    else:
+        return "Debian"
     from funcs.main import get_output
     return get_output(command, "stderr")
 
-# 下载软件包
-def download_file(url, destination): 
-    # print(f"正在从 {url} 获取 {destination}...")
-    try:
-        response = requests.get(url,  stream=True) 
-        if response.status_code  == 200: 
-            with open(destination, 'wb') as file: 
-                for chunk in response.iter_content(chunk_size=1024):  
-                    file.write(chunk)  
-            return 0
-        else: 
-            return response.status_code
-    except requests.exceptions.ConnectionError as e:
-        return e
-    except requests.RequestException as e:
-        return e
+# 下载软件包 
+def download_file(url, destination):  
+    print(f"正在从 {url} 获取 {destination}...") 
+    try: 
+        response = requests.get(url)   
+        response.raise_for_status()  
+    except requests.exceptions.ConnectionError  as e: 
+        return f"连接错误: {e}" 
+    except requests.exceptions.RequestException  as e: 
+        return f"请求错误: {e}" 
+    try: 
+        with open(destination, 'wb') as file:  
+            for chunk in response.iter_content(chunk_size=1024):    
+                file.write(chunk)    
+    except PermissionError as e: 
+        return "没有权限下载软件包! 需要管理员或 root 身份执行! " 
+    except (FileNotFoundError, IOError) as e: 
+        return f"文件操作错误: {e}" 
 
 # 是否为最新版本
 def is_newer_version(tag1, tag2): 
